@@ -256,7 +256,7 @@ st.markdown("""
 
 # 1. OAuth Session Credentials Verification
 creds = get_gmail_credentials()
-is_logged_in = creds is not None
+is_logged_in = creds is not None or st.session_state.get("logged_in", False)
 
 # Retrieve user context dynamically if logged in via Gmail API
 user_name = "Loading..."
@@ -299,9 +299,12 @@ with st.sidebar:
         st.markdown("<div style='padding: 0 15px 20px 15px;'>", unsafe_allow_html=True)
         if st.button("🔑 Sign in with Google", use_container_width=True, type="primary", key="sidebar_signin_btn"):
             try:
-                creds = run_oauth_flow()
-                st.success("Successfully Authenticated!")
-                st.rerun()
+                # creds = run_oauth_flow()
+                # st.success("Successfully Authenticated!")
+                # st.rerun()
+                auth_url, flow = run_oauth_flow()
+                st.session_state["flow"] = flow
+                st.link_button("🔐 Sign in with Google", auth_url)
             except Exception as e:
                 st.error(f"Authentication failed: {e}")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -355,7 +358,23 @@ with st.sidebar:
                     del st.session_state[key]
             st.success("Signed out successfully!")
             st.rerun()
+        #ad after login button area
+query_params = st.query_params
+code = query_params.get("code")
 
+if code and "flow" in st.session_state:
+    flow = st.session_state["flow"]
+
+    flow.fetch_token(code=code)
+    creds = flow.credentials
+
+    with open("token.json", "w") as f:
+        f.write(creds.to_json())
+
+    st.success("Login successful!")
+
+    st.session_state["logged_in"] = True
+    st.rerun()
 # Main Container Area
 if not is_logged_in:
     # Render a premium, centered Google Sign-In gate!
