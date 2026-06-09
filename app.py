@@ -2,7 +2,8 @@ import streamlit as st
 import os
 import pandas as pd
 from dotenv import load_dotenv
-
+with open("credentials.json", "w") as f:
+    f.write(os.environ["GOOGLE_CREDENTIALS_JSON"])
 # Import and dynamically reload custom modules to prevent Streamlit hot-reload caching issues
 import importlib
 
