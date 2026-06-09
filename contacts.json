@@ -1,0 +1,35 @@
+[
+  {
+    "recipient_name": "Priya Sharma",
+    "recipient_email": "ranafenil13307@gmail.com",
+    "company": "Acme AI",
+    "role": "Backend Engineering Intern",
+    "job_url": "https://example.com/job-acme",
+    "personalization_note": "I recently saw that Acme AI launched its new AI-driven workflow automation product, which looks incredibly powerful.",
+    "candidate_name": "Rana",
+    "candidate_background": "a Python developer who loves building automations, background jobs, and agentic workflows",
+    "portfolio_url": "https://github.com/ranadev"
+  },
+  {
+    "recipient_name": "John Doe",
+    "recipient_email": "john.doe@example.com",
+    "company": "TechStream",
+    "role": "Software Engineer (Python/Django)",
+    "job_url": "https://example.com/job-techstream",
+    "personalization_note": "I saw your open-source repositories and was really impressed by the Django scalability architecture you discussed on your tech blog.",
+    "candidate_name": "Rana",
+    "candidate_background": "a Software Engineering student with experience building clean RESTful APIs and backend architectures using Python and Django",
+    "portfolio_url": "https://github.com/ranadev"
+  },
+  {
+    "recipient_name": "Alice Johnson",
+    "recipient_email": "alice@example.com",
+    "company": "DevOpsFlow",
+    "role": "Junior DevOps Engineer",
+    "job_url": "https://example.com/job-devopsflow",
+    "personalization_note": "I noticed your company's focus on simplifying Kubernetes deployments and providing developers with a streamlined GitOps CI/CD pipeline.",
+    "candidate_name": "Rana",
+    "candidate_background": "a junior developer with hands-on experience building automated Docker environments, CI/CD pipelines, and scripting with Python",
+    "portfolio_url": "https://github.com/ranadev"
+  }
+]
