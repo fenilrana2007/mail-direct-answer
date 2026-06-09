@@ -1,65 +1,81 @@
+import streamlit as st
 import os
-import logging
-from google.auth.transport.requests import Request
+import json
+from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-
-logger = logging.getLogger(__name__)
+from google.auth.transport.requests import Request
 
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.modify",
     "https://www.googleapis.com/auth/gmail.send"
 ]
 
-def get_gmail_credentials():
-    """
-    Load cached credentials from token.json if valid, or refresh them.
-    
-    Returns:
-        Credentials or None: The authenticated Google credentials.
-    """
-    creds = None
-    if os.path.exists("token.json"):
-        try:
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-        except Exception as e:
-            logger.error(f"Failed to load cached credentials: {e}")
-            
-    if creds and creds.expired and creds.refresh_token:
-        try:
-            logger.info("Credentials expired. Attempting refresh...")
-            creds.refresh(Request())
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
-        except Exception as e:
-            logger.error(f"Failed to refresh credentials: {e}")
-            creds = None
-            
-    return creds
+REDIRECT_URI = "https://mail-direct-answer.onrender.com"
 
-def run_oauth_flow():
-    """
-    Execute the secure interactive browser OAuth 2.0 authorization server flow.
-    Saves the user refresh credentials locally to token.json.
-    
-    Returns:
-        Credentials: Authenticated credentials.
-    """
-    # Check if client credentials file exists
-    credentials_file = "credentials.json"
-    if not os.path.exists(credentials_file):
-        raise FileNotFoundError(
-            "Configuration Error: Missing credentials.json. Please upload your OAuth Client secrets file."
-        )
-        
-    logger.info("Starting local interactive browser OAuth flow...")
-    flow = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
-    
-    # Run server on a static port (8080) to match Google Console redirect URI exactly
-    creds = flow.run_local_server(port=8080, prompt="consent")
-    
-    with open("token.json", "w") as token:
-        token.write(creds.to_json())
-        
-    logger.info("OAuth completed. Saved token.json successfully!")
-    return creds
+
+# ---------------------------
+# LOAD SAVED TOKEN
+# ---------------------------
+def load_credentials():
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            with open("token.json", "w") as f:
+                f.write(creds.to_json())
+
+        return creds
+    return None
+
+
+# ---------------------------
+# CREATE OAUTH FLOW
+# ---------------------------
+def create_flow():
+    flow = Flow.from_client_secrets_file(
+        "credentials.json",
+        scopes=SCOPES,
+        redirect_uri=REDIRECT_URI
+    )
+    return flow
+
+
+# ---------------------------
+# STREAMLIT UI
+# ---------------------------
+st.title("📧 Gmail OAuth on Render")
+
+creds = load_credentials()
+
+# If already logged in
+if creds:
+    st.success("Already logged in!")
+    st.write("Token loaded successfully.")
+
+else:
+    flow = create_flow()
+
+    # Generate Google login URL
+    auth_url, state = flow.authorization_url(
+        access_type="offline",
+        include_granted_scopes=True,
+        prompt="consent"
+    )
+
+    st.link_button("🔐 Login with Google", auth_url)
+
+    # Handle redirect
+    query_params = st.query_params
+    code = query_params.get("code")
+
+    if code:
+        flow.fetch_token(code=code)
+
+        creds = flow.credentials
+
+        # Save token
+        with open("token.json", "w") as f:
+            f.write(creds.to_json())
+
+        st.success("Login successful! Reload the page.")
