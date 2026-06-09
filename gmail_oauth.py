@@ -43,7 +43,7 @@ def run_oauth_flow():
 
     auth_url, state = flow.authorization_url(
         access_type="offline",
-        include_granted_scopes=True,
+        include_granted_scopes="true",
         prompt="consent"
     )
 
