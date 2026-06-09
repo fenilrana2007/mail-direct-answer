@@ -8,7 +8,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.send"
 ]
 
-REDIRECT_URI = "https://mail-direct-answer.onrender.com"
+REDIRECT_URI = "https://mail-direct-answer.onrender.com/"
 
 
 # -------------------------
